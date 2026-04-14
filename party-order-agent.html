@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Party Order — Catering & Hospitality</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --cream: #FAF7F2;
+  --warm: #F2EDE4;
+  --gold: #C8953A;
+  --gold-light: #F5E6CC;
+  --gold-dark: #8B6420;
+  --deep: #1C1A17;
+  --mid: #5C5649;
+  --muted: #9C9488;
+  --white: #FFFFFF;
+  --green: #2D6A4F;
+  --green-light: #D8EDDF;
+  --red: #9B2335;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--deep);
+  min-height: 100vh;
+  font-size: 15px;
+}
+.page-header {
+  background: var(--deep);
+  color: var(--white);
+  padding: 22px 20px 18px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(200,149,58,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-tag {
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.header-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+}
+.container { max-width: 520px; margin: 0 auto; padding: 18px 16px 40px; }
+
+/* Screens */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Step bar */
+.step-bar { display: flex; gap: 6px; margin-bottom: 20px; padding-top: 4px; }
+.step-seg { flex: 1; height: 3px; border-radius: 2px; background: var(--warm); transition: background .3s; }
+.step-seg.done { background: var(--gold); }
+
+/* Cards */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid rgba(200,149,58,0.15);
+  padding: 18px 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title span { color: var(--gold); font-size: 14px; }
+
+/* Event grid */
+.ev-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ev-btn {
+  padding: 10px 4px 8px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--mid);
+  background: var(--cream);
+  transition: all .18s;
+  font-family: 'DM Sans', sans-serif;
+}
+.ev-btn:hover { border-color: var(--gold); background: var(--gold-light); }
+.ev-btn.sel {
+  border: 1.5px solid var(--gold);
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  font-weight: 500;
+}
+.ev-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+/* People counter */
+.ppl-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+.ppl-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(200,149,58,0.4);
+  background: var(--cream);
+  cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold-dark); font-family: 'DM Sans', sans-serif;
+  transition: background .15s;
+}
+.ppl-btn:hover { background: var(--gold-light); }
+.ppl-val { font-size: 24px; font-weight: 500; color: var(--deep); min-width: 36px; text-align: center; }
+.ppl-label { font-size: 13px; color: var(--muted); }
+.price-chips { display: flex; gap: 10px; margin-top: 12px; }
+.price-chip {
+  flex: 1; background: var(--cream); border-radius: var(--radius-sm);
+  padding: 10px 12px; text-align: center;
+  border: 1px solid rgba(200,149,58,0.15);
+}
+.pc-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.pc-val { font-size: 18px; font-weight: 500; color: var(--deep); }
+
+/* Menu items */
+.item-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.item-row:last-child { border-bottom: none; }
+.item-name { font-size: 14px; color: var(--deep); line-height: 1.3; }
+.item-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+.badge {
+  font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500;
+}
+.bs { background: #EDE9FE; color: #5B21B6; }
+.bp { background: #FEE2E2; color: #991B1B; }
+.bd { background: #D1FAE5; color: #065F46; }
+.bc { background: #FEF3C7; color: #92400E; }
+.incl { font-size: 11px; color: var(--green); font-weight: 500; }
+.extra-price { font-size: 11px; color: var(--muted); }
+.qty-ctrl { display: flex; align-items: center; gap: 10px; }
+.qty-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid rgba(200,149,58,0.35);
+  background: var(--cream); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold-dark); font-family: 'DM Sans', sans-serif;
+  transition: background .15s;
+}
+.qty-btn:hover { background: var(--gold-light); }
+.qty-num { font-size: 14px; font-weight: 500; min-width: 16px; text-align: center; color: var(--deep); }
+
+/* Cake name */
+.cake-name-wrap {
+  background: var(--cream); border-radius: var(--radius-sm);
+  padding: 12px; margin-top: 10px;
+  border: 1px dashed rgba(200,149,58,0.4);
+}
+.cake-name-label {
+  font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+}
+
+/* Summary */
+.sum-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--mid); }
+.sum-total {
+  display: flex; justify-content: space-between;
+  font-size: 18px; font-weight: 500; color: var(--deep);
+  border-top: 1px solid rgba(0,0,0,0.08); margin-top: 10px; padding-top: 12px;
+}
+
+/* Inputs */
+.field-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; font-weight: 500; letter-spacing: .02em; }
+.inp {
+  width: 100%; padding: 10px 13px;
+  border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm);
+  font-size: 14px; background: var(--white); color: var(--deep);
+  margin-bottom: 14px; font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s;
+}
+.inp:focus { outline: none; border-color: var(--gold); }
+textarea.inp { resize: none; }
+
+/* Buttons */
+.btn-primary {
+  width: 100%; padding: 14px; background: var(--deep);
+  color: var(--white); border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; margin-top: 14px;
+  letter-spacing: .02em; transition: opacity .18s;
+  position: relative; overflow: hidden;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(200,149,58,0.12) 100%);
+}
+.btn-primary:hover { opacity: .88; }
+.btn-wa {
+  width: 100%; padding: 14px; background: #25D366;
+  color: var(--white); border: none; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; margin-top: 10px;
+  transition: opacity .18s;
+}
+.btn-wa:hover { opacity: .9; }
+.btn-outline {
+  width: 100%; padding: 12px; background: transparent;
+  color: var(--mid); border: 1px solid rgba(0,0,0,0.14);
+  border-radius: var(--radius-sm); font-size: 14px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; margin-top: 8px; transition: background .18s;
+}
+.btn-outline:hover { background: var(--warm); }
+.back-lnk {
+  font-size: 13px; color: var(--muted); cursor: pointer;
+  margin-bottom: 16px; display: inline-flex; align-items: center; gap: 4px;
+  transition: color .15s;
+}
+.back-lnk:hover { color: var(--deep); }
+
+/* Success */
+.success-circle {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--green-light);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-size: 26px; color: var(--green);
+}
+.info-note {
+  font-size: 12px; color: var(--muted); text-align: center;
+  margin-top: 10px; padding: 10px 12px;
+  background: var(--warm); border-radius: var(--radius-sm);
+}
+
+/* Error */
+.err-msg { font-size: 12px; color: var(--red); margin-top: -10px; margin-bottom: 12px; display: none; }
+
+/* Divider */
+.divider { height: 1px; background: rgba(0,0,0,0.06); margin: 4px 0 12px; }
+
+@media (max-width: 380px) {
+  .header-title { font-size: 22px; }
+  .ev-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-tag">Catering &amp; Hospitality</div>
+  <div class="header-title">Party Order Planner</div>
+  <div class="header-sub">Customise your package · We deliver to your door</div>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN 1: Customise -->
+  <div id="s1" class="screen active">
+
+    <div class="card">
+      <div class="card-title"><span>🎊</span> Event type</div>
+      <div class="ev-grid" id="ev-grid"></div>
+      <div class="divider" style="margin-top:14px"></div>
+      <div class="card-title" style="margin-bottom:10px"><span>👥</span> Number of people</div>
+      <div class="ppl-row">
+        <button class="ppl-btn" onclick="changePpl(-5)">−</button>
+        <span class="ppl-val" id="ppl-val">25</span>
+        <button class="ppl-btn" onclick="changePpl(5)">+</button>
+        <span class="ppl-label">people &nbsp;·&nbsp; min 10</span>
+      </div>
+      <div class="price-chips">
+        <div class="price-chip">
+          <div class="pc-label">Base price</div>
+          <div class="pc-val" id="base-disp">₹5,000</div>
+        </div>
+        <div class="price-chip">
+          <div class="pc-label">Per person</div>
+          <div class="pc-val">₹200</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🍬</span> Sweet snacks <small style="text-transform:none;font-weight:300;letter-spacing:0;color:var(--muted)">&nbsp;— 1 variety included</small></div>
+      <div id="sweet-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🌶️</span> Spicy snacks <small style="text-transform:none;font-weight:300;letter-spacing:0;color:var(--muted)">&nbsp;— 2 varieties included</small></div>
+      <div id="spicy-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🥤</span> Soft drinks <small style="text-transform:none;font-weight:300;letter-spacing:0;color:var(--muted)">&nbsp;— 1 bottle/person included</small></div>
+      <div id="drink-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🎂</span> Birthday cake <small style="text-transform:none;font-weight:300;letter-spacing:0;color:var(--muted)">&nbsp;— 1 cake included (2 kg)</small></div>
+      <div id="cake-list"></div>
+      <div class="cake-name-wrap">
+        <div class="cake-name-label">✍️ &nbsp;Name / message to write on the cake <span style="color:var(--muted);font-weight:300">(optional)</span></div>
+        <input class="inp" id="cake-name" placeholder='e.g. Happy Birthday Arjun! 🎉' style="margin-bottom:0" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🧾</span> Order summary</div>
+      <div id="sum-lines"></div>
+      <div class="sum-total"><span>Total</span><span id="total-disp">₹5,000</span></div>
+    </div>
+
+    <button class="btn-primary" onclick="goDetails()">Continue — enter your details →</button>
+  </div>
+
+  <!-- SCREEN 2: Details -->
+  <div id="s2" class="screen">
+    <div class="step-bar">
+      <div class="step-seg done"></div>
+      <div class="step-seg done"></div>
+      <div class="step-seg"></div>
+    </div>
+    <div class="back-lnk" onclick="show('s1')">← Back to order</div>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:4px">Your details</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Our manager will call to confirm your order and arrange payment</div>
+
+    <div class="card">
+      <label class="field-label">Your name *</label>
+      <input class="inp" id="c-name" placeholder="e.g. Priya Sharma" />
+
+      <label class="field-label">Mobile number *</label>
+      <input class="inp" id="c-phone" placeholder="10-digit mobile number" maxlength="10" type="tel" />
+      <div class="err-msg" id="ph-err">Please enter a valid 10-digit mobile number</div>
+
+      <label class="field-label">Delivery address *</label>
+      <textarea class="inp" id="c-addr" rows="3" placeholder="House / flat, street, area, city, pincode"></textarea>
+
+      <label class="field-label">Party date *</label>
+      <input class="inp" id="c-date" type="date" />
+
+      <label class="field-label">Party time</label>
+      <input class="inp" id="c-time" type="time" />
+
+      <label class="field-label">Special instructions <span style="font-weight:300;color:var(--muted)">(optional)</span></label>
+      <input class="inp" id="c-note" placeholder="e.g. Vegetarian only, no peanuts, gate code…" style="margin-bottom:0" />
+    </div>
+
+    <button class="btn-primary" onclick="submitOrder()">Place my order →</button>
+  </div>
+
+  <!-- SCREEN 3: Confirmation -->
+  <div id="s3" class="screen">
+    <div style="text-align:center;padding:2rem 0 1.5rem">
+      <div class="success-circle">✓</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:6px">Order received!</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Our manager will call <strong id="conf-phone" style="color:var(--deep)"></strong><br>shortly to confirm and arrange payment.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🧾</span> Order recap</div>
+      <div id="recap-lines"></div>
+      <div class="sum-total"><span>Total</span><span id="recap-total"></span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📍</span> Delivery details</div>
+      <div class="sum-row"><span>Name</span><span style="color:var(--deep);font-weight:500" id="r-name"></span></div>
+      <div class="sum-row"><span>Mobile</span><span style="color:var(--deep)" id="r-phone"></span></div>
+      <div class="sum-row" style="align-items:flex-start"><span>Address</span><span style="color:var(--deep);max-width:58%;text-align:right" id="r-addr"></span></div>
+      <div class="sum-row"><span>Date &amp; time</span><span style="color:var(--deep)" id="r-dt"></span></div>
+      <div class="sum-row" id="r-cake-row" style="display:none"><span>Cake message</span><span style="color:var(--deep);max-width:58%;text-align:right" id="r-cake"></span></div>
+      <div class="sum-row" id="r-note-row" style="display:none"><span>Note</span><span style="color:var(--deep);max-width:58%;text-align:right" id="r-note"></span></div>
+    </div>
+
+    <button class="btn-wa" id="wa-btn" onclick="openWA()">
+      📲 &nbsp;Send order to us via WhatsApp
+    </button>
+    <div class="info-note">We'll also confirm everything on the call before any payment is made.</div>
+    <button class="btn-outline" onclick="resetAll()">Start a new order</button>
+  </div>
+
+</div>
+
+<script>
+const WA_NUMBER = '919000333681';
+const BASE_PPP  = 200;
+
+const events = [
+  {id:'birthday',   label:'Birthday',    icon:'🎂'},
+  {id:'anniversary',label:'Anniversary', icon:'💍'},
+  {id:'corporate',  label:'Corporate',   icon:'🏢'},
+  {id:'babyshower', label:'Baby shower', icon:'🍼'},
+  {id:'kitty',      label:'Kitty party', icon:'🎊'},
+  {id:'custom',     label:'Other',       icon:'✨'},
+];
+
+const menu = {
+  sweet:[
+    {id:'cookie',   name:'Assorted cookies',        extra:0},
+    {id:'banana',   name:'Banana cake slices',       extra:0},
+    {id:'brownie',  name:'Chocolate brownies',       extra:300},
+    {id:'ladoo',    name:'Motichoor ladoo box',       extra:250},
+    {id:'cupcake',  name:'Mini cupcakes (12 pcs)',    extra:400},
+    {id:'jalebi',   name:'Fresh jalebi box',          extra:200},
+  ],
+  spicy:[
+    {id:'samosa',   name:'Mini samosa (50 pcs)',      extra:0},
+    {id:'puff',     name:'Veg puff (30 pcs)',          extra:0},
+    {id:'chips',    name:'Masala chips pack',          extra:200},
+    {id:'mpizza',   name:'Mini pizza (24 pcs)',        extra:500},
+    {id:'spring',   name:'Spring rolls (20 pcs)',      extra:350},
+    {id:'pakora',   name:'Bread pakora (30 pcs)',      extra:200},
+    {id:'manchurian',name:'Veg manchurian (30 pcs)',   extra:400},
+  ],
+  drink:[
+    {id:'cola',     name:'Pepsi / Coke (200ml)',       extra:0},
+    {id:'juice',    name:'Frooti / Maaza (200ml)',     extra:150},
+    {id:'soda',     name:'Limca / Sprite (200ml)',     extra:150},
+    {id:'water',    name:'Mineral water (500ml)',      extra:100},
+  ],
+  cake:[
+    {id:'choc',     name:'Chocolate cream (2 kg)',     extra:0},
+    {id:'vanilla',  name:'Vanilla cream (2 kg)',       extra:0},
+    {id:'fruit',    name:'Fresh fruit cake (2 kg)',    extra:300},
+    {id:'black',    name:'Black forest (2 kg)',        extra:400},
+    {id:'butter',   name:'Butterscotch (2 kg)',        extra:350},
+    {id:'redv',     name:'Red velvet (2 kg)',           extra:500},
+  ],
+};
+
+const freeCounts = {sweet:1, spicy:2, drink:1, cake:1};
+const badgeCls   = {sweet:'bs', spicy:'bp', drink:'bd', cake:'bc'};
+
+let people=25, selEvent='birthday', qty={};
+
+function initQty(){
+  qty={};
+  menu.sweet.forEach((i,x)  => qty[i.id] = x===0?1:0);
+  menu.spicy.forEach((i,x)  => qty[i.id] = x<2?1:0);
+  menu.drink.forEach((i,x)  => qty[i.id] = x===0?1:0);
+  menu.cake.forEach((i,x)   => qty[i.id] = x===0?1:0);
+}
+initQty();
+
+function calcBase(){ return Math.max(10,people)*BASE_PPP; }
+function calcExtra(){
+  let ex=0;
+  ['sweet','spicy','drink','cake'].forEach(cat=>{
+    let free=freeCounts[cat], used=0;
+    [...menu[cat]].sort((a,b)=>a.extra-b.extra).forEach(item=>{
+      for(let i=0;i<(qty[item.id]||0);i++){
+        if(used<free&&item.extra===0) used++;
+        else ex+=item.extra;
+      }
+    });
+  });
+  return ex;
+}
+function calcTotal(){ return calcBase()+calcExtra(); }
+
+function changePpl(d){
+  people=Math.max(10,people+d);
+  renderAll();
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function renderEvents(){
+  const g=document.getElementById('ev-grid'); g.innerHTML='';
+  events.forEach(ev=>{
+    const b=document.createElement('div');
+    b.className='ev-btn'+(selEvent===ev.id?' sel':'');
+    b.innerHTML=`<span class="ev-icon">${ev.icon}</span>${ev.label}`;
+    b.onclick=()=>{ selEvent=ev.id; renderAll(); };
+    g.appendChild(b);
+  });
+}
+
+function renderList(cat, cid){
+  const el=document.getElementById(cid); el.innerHTML='';
+  menu[cat].forEach(item=>{
+    const q=qty[item.id]||0;
+    const row=document.createElement('div'); row.className='item-row';
+    const priceHtml=item.extra
+      ? `<span class="extra-price">+₹${item.extra}</span>`
+      : `<span class="incl">✓ Included</span>`;
+    row.innerHTML=`
+      <div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">
+          <span class="badge ${badgeCls[cat]}">${cat}</span>
+          ${priceHtml}
+        </div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="ch('${item.id}','${cat}',-1)">−</button>
+        <span class="qty-num">${q}</span>
+        <button class="qty-btn" onclick="ch('${item.id}','${cat}',1)">+</button>
+      </div>`;
+    el.appendChild(row);
+  });
+}
+
+function ch(id,cat,d){
+  qty[id]=Math.max(0,(qty[id]||0)+d);
+  if(cat==='cake'&&d===1) menu.cake.forEach(c=>{ if(c.id!==id) qty[c.id]=0; });
+  renderAll();
+}
+
+function renderSummary(){
+  const el=document.getElementById('sum-lines'); el.innerHTML='';
+  [...menu.sweet,...menu.spicy,...menu.drink,...menu.cake].forEach(item=>{
+    const q=qty[item.id]||0;
+    if(q>0){
+      const r=document.createElement('div'); r.className='sum-row';
+      r.innerHTML=`<span>${item.name}${q>1?` ×${q}`:''}</span><span>${item.extra?`+₹${(item.extra*q).toLocaleString('en-IN')}`:'Included'}</span>`;
+      el.appendChild(r);
+    }
+  });
+  document.getElementById('base-disp').textContent=`₹${calcBase().toLocaleString('en-IN')}`;
+  document.getElementById('ppl-val').textContent=people;
+  document.getElementById('total-disp').textContent=`₹${calcTotal().toLocaleString('en-IN')}`;
+}
+
+function renderAll(){
+  renderEvents();
+  renderList('sweet','sweet-list');
+  renderList('spicy','spicy-list');
+  renderList('drink','drink-list');
+  renderList('cake','cake-list');
+  renderSummary();
+}
+
+function goDetails(){
+  const hasSweet=menu.sweet.some(i=>qty[i.id]>0);
+  const hasSpicy=menu.spicy.some(i=>qty[i.id]>0);
+  const hasCake =menu.cake.some(i=>qty[i.id]>0);
+  if(!hasSweet||!hasSpicy||!hasCake){
+    alert('Please select at least 1 sweet, 1 spicy snack, and 1 cake to continue.');
+    return;
+  }
+  show('s2');
+}
+
+function buildWAText(n,ph,addr,dtStr,note,cakeName){
+  const evLabel=events.find(e=>e.id===selEvent)?.label||selEvent;
+  let lines=[
+    `*🎉 New Party Order*`,``,
+    `*Event:* ${evLabel}`,
+    `*Guests:* ${people} people`,``,
+    `*Items selected:*`,
+  ];
+  [...menu.sweet,...menu.spicy,...menu.drink,...menu.cake].forEach(item=>{
+    const q=qty[item.id]||0;
+    if(q>0) lines.push(`• ${item.name}${q>1?` ×${q}`:''}${item.extra?` (+₹${item.extra*q})`:''}`)
+  });
+  if(cakeName) lines.push(`• Cake message: _"${cakeName}"_`);
+  lines.push(``);
+  lines.push(`*Total: ₹${calcTotal().toLocaleString('en-IN')}*`);
+  lines.push(``);
+  lines.push(`*Customer details:*`);
+  lines.push(`Name: ${n}`);
+  lines.push(`Mobile: ${ph}`);
+  lines.push(`Address: ${addr}`);
+  lines.push(`Date & time: ${dtStr}`);
+  if(note) lines.push(`Note: ${note}`);
+  return lines.join('\n');
+}
+
+function submitOrder(){
+  const n    = document.getElementById('c-name').value.trim();
+  const ph   = document.getElementById('c-phone').value.trim();
+  const addr = document.getElementById('c-addr').value.trim();
+  const date = document.getElementById('c-date').value;
+  const time = document.getElementById('c-time').value;
+  const note = document.getElementById('c-note').value.trim();
+  const cakeName = document.getElementById('cake-name').value.trim();
+  const perr = document.getElementById('ph-err');
+  perr.style.display='none';
+
+  if(!n||!ph||!addr||!date){ alert('Please fill in all required fields (name, mobile, address, date).'); return; }
+  if(!/^[6-9]\d{9}$/.test(ph)){ perr.style.display='block'; return; }
+
+  const dtStr = new Date(date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})+(time?` at ${time}`:'');
+
+  document.getElementById('conf-phone').textContent=ph;
+  document.getElementById('r-name').textContent=n;
+  document.getElementById('r-phone').textContent=ph;
+  document.getElementById('r-addr').textContent=addr;
+  document.getElementById('r-dt').textContent=dtStr;
+
+  if(cakeName){
+    document.getElementById('r-cake').textContent=`"${cakeName}"`;
+    document.getElementById('r-cake-row').style.display='flex';
+  }
+  if(note){
+    document.getElementById('r-note').textContent=note;
+    document.getElementById('r-note-row').style.display='flex';
+  }
+
+  const recapEl=document.getElementById('recap-lines'); recapEl.innerHTML='';
+  [...menu.sweet,...menu.spicy,...menu.drink,...menu.cake].forEach(item=>{
+    const q=qty[item.id]||0;
+    if(q>0){
+      const r=document.createElement('div'); r.className='sum-row';
+      r.innerHTML=`<span>${item.name}${q>1?` ×${q}`:''}</span><span>${item.extra?`+₹${(item.extra*q).toLocaleString('en-IN')}`:'Included'}</span>`;
+      recapEl.appendChild(r);
+    }
+  });
+  document.getElementById('recap-total').textContent=`₹${calcTotal().toLocaleString('en-IN')}`;
+
+  window._waText = buildWAText(n,ph,addr,dtStr,note,cakeName);
+  show('s3');
+}
+
+function openWA(){
+  const url=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(window._waText||'')}`;
+  window.open(url,'_blank');
+}
+
+function resetAll(){
+  initQty(); people=25; selEvent='birthday';
+  ['c-name','c-phone','c-addr','c-date','c-time','c-note','cake-name'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('r-cake-row').style.display='none';
+  document.getElementById('r-note-row').style.display='none';
+  renderAll();
+  show('s1');
+}
+
+renderAll();
+</script>
+</body>
+</html>
